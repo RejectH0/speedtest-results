@@ -8,6 +8,7 @@ import os
 import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
+from icecream import ic
 
 # Configuration Variables
 config = configparser.ConfigParser()
@@ -32,14 +33,16 @@ def fetch_data(cursor, db_name):
         SELECT timestamp, (download / 1024 / 1024) AS download_mbps, (upload / 1024 / 1024) AS upload_mbps FROM {}
         """.format(db_name + ".speedtest_results")
         cursor.execute(query)
-        return pd.DataFrame(cursor.fetchall(), columns=['timestamp', 'download_mbps', 'upload_mbps'])
+        ic("Data from", db_name, ":", data.head())
+		return pd.DataFrame(cursor.fetchall(), columns=['timestamp', 'download_mbps', 'upload_mbps'])
     except Exception as e:
         print(f"Error fetching data from database {db_name}: {e}")
         return pd.DataFrame()
 
 def plot_data(data, db_name):
     try:
-        sns.set(style="whitegrid")
+        ic("Plotting data for", db_name)
+		sns.set(style="whitegrid")
         plt.figure(figsize=(10, 6))
         plt.plot(data['timestamp'], data['download_mbps'], label='Download Mbps', color='blue')
         plt.plot(data['timestamp'], data['upload_mbps'], label='Upload Mbps', color='red')
@@ -47,10 +50,17 @@ def plot_data(data, db_name):
         plt.ylabel('Speed (Mbps)')
         plt.title(f'Speedtest Results for {db_name}')
         plt.legend()
-        plt.savefig(f'{db_name}_speedtest_results.png')
+        # Filename for the output PNG
+        filename = f'{db_name}_speedtest_results.png'
+        ic(f"Creating plot for {db_name}, saving as {filename}")
+
+        # Saving the plot as a PNG file
+        plt.savefig(filename)
+        ic(f"Plot saved as {filename}")
+
         plt.close()
     except Exception as e:
-        print(f"Error plotting data for database {db_name}: {e}")
+        ic(f"Error plotting data for database {db_name}: {e}")
 
 def main():
     conn = None
@@ -61,8 +71,9 @@ def main():
 
         # Retrieve list of databases
         dbs = get_databases(cursor)
-
-        for db in dbs:
+        ic("Databses Found: ",dbs)
+        
+		for db in dbs:
             # Fetch data from each database
             data = fetch_data(cursor, db)
 
