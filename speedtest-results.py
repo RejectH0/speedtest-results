@@ -22,9 +22,11 @@ def get_databases(cursor):
     try:
         cursor.execute("SHOW DATABASES;")
         all_dbs = cursor.fetchall()
-        return [db[0] for db in all_dbs if db[0].endswith('-speedtest')]
+        speedtest_dbs = [db[0] for db in all_dbs if db[0].endswith('-speedtest')]
+        ic("Databases found:", speedtest_dbs)  # Debugging line
+        return speedtest_dbs
     except Exception as e:
-        print(f"Error fetching database list: {e}")
+        ic(f"Error fetching database list: {e}")
         return []
 
 def fetch_data(cursor, db_name):
@@ -36,7 +38,7 @@ def fetch_data(cursor, db_name):
         ic("Data from", db_name, ":", data.head())
         return pd.DataFrame(cursor.fetchall(), columns=['timestamp', 'download_mbps', 'upload_mbps'])
     except Exception as e:
-        print(f"Error fetching data from database {db_name}: {e}")
+        ic(f"Error fetching data from database {db_name}: {e}")
         return pd.DataFrame()
 
 def plot_data(data, db_name):
@@ -82,7 +84,7 @@ def main():
                 plot_data(data, db)
 
     except Exception as e:
-        print(f"Error: {e}")
+        ic(f"Error: {e}")
     finally:
         if conn:
             conn.close()
