@@ -38,7 +38,7 @@ Initialize and activate the Python environment:
 
 ```bash
 python3 -m venv speedtest-results
-source speedtest-logger/bin/activate
+source speedtest-results/bin/activate
 cd speedtest-results
 ./speedtest_results.py
 ```
