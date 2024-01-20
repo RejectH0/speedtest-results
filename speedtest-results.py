@@ -52,36 +52,36 @@ def plot_data(data, db_name):
         sns.set(style="whitegrid")
         fig, ax1 = plt.subplots(figsize=(10, 6))
 
-        ax1.plot(data['timestamp'], data['download_mbps'], label='Download Mbps', color='blue')
+        color = 'tab:blue'
         ax1.set_xlabel('Timestamp')
-        ax1.set_ylabel('Download Speed (Mbps)', color='blue')
-        ax1.tick_params(axis='y', labelcolor='blue')
+        ax1.set_ylabel('Download Speed (Mbps)', color=color)
+        ax1.plot(data['timestamp'], data['download_mbps'], label='Download Mbps', color=color)
+        ax1.tick_params(axis='y', labelcolor=color)
 
-        # Set the limit for the y-axis based on download speed range
-        ax1.set_ylim([0, data['download_mbps'].max() + data['download_mbps'].max() * 0.1])
+        # Set the y-axis for download to show full range of data
+        ax1.set_ylim(min(data['download_mbps']) - (max(data['download_mbps']) * 0.1), 
+                     max(data['download_mbps']) + (max(data['download_mbps']) * 0.1))
 
-        # If upload speeds are significantly lower than download speeds, use a secondary axis
-        if data['upload_mbps'].max() < data['download_mbps'].max() / 10:
-            ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
-            ax2.plot(data['timestamp'], data['upload_mbps'], label='Upload Mbps', color='red')
-            ax2.set_ylabel('Upload Speed (Mbps)', color='red')
-            ax2.tick_params(axis='y', labelcolor='red')
+        ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 
-            # Set the limit for the y-axis based on upload speed range
-            ax2.set_ylim([0, data['upload_mbps'].max() + data['upload_mbps'].max() * 0.1])
+        color = 'tab:red'
+        ax2.set_ylabel('Upload Speed (Mbps)', color=color)  
+        ax2.plot(data['timestamp'], data['upload_mbps'], label='Upload Mbps', color=color)
+        ax2.tick_params(axis='y', labelcolor=color)
 
-            # Create a legend for the second y-axis
-            ax2.legend(loc='upper right')
-        else:
-            ax1.plot(data['timestamp'], data['upload_mbps'], label='Upload Mbps', color='red')
-            ax1.legend(loc='upper left')
+        # Set the y-axis for upload to show full range of data
+        ax2.set_ylim(min(data['upload_mbps']) - (max(data['upload_mbps']) * 0.1), 
+                     max(data['upload_mbps']) + (max(data['upload_mbps']) * 0.1))
 
         # Improve the readability of the x-axis.
         ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d %H:%M'))
         ax1.xaxis.set_major_locator(mdates.HourLocator(interval=1))
         fig.autofmt_xdate()  # Rotation
 
+        fig.tight_layout()  # otherwise the right y-label is slightly clipped
         plt.title(f'Speedtest Results for {db_name}')
+        ax1.legend(loc='upper left')
+        ax2.legend(loc='upper right')
 
         # Generate the filename with the current date and time
         current_time = datetime.now().strftime('%Y%m%d%H%M%S')
