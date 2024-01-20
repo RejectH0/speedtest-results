@@ -35,8 +35,9 @@ def fetch_data(cursor, db_name):
         SELECT timestamp, (download / 1024 / 1024) AS download_mbps, (upload / 1024 / 1024) AS upload_mbps FROM {}
         """.format(db_name + ".speedtest_results")
         cursor.execute(query)
-        ic("Data from", db_name, ":", data.head())
-        return pd.DataFrame(cursor.fetchall(), columns=['timestamp', 'download_mbps', 'upload_mbps'])
+        data = pd.DataFrame(cursor.fetchall(), columns=['timestamp', 'download_mbps', 'upload_mbps'])
+        ic("Data from", db_name, ":", data.head())  # Moved this line here
+        return data
     except Exception as e:
         ic(f"Error fetching data from database {db_name}: {e}")
         return pd.DataFrame()
