@@ -34,7 +34,7 @@ def fetch_data(cursor, db_name):
         """.format(db_name + ".speedtest_results")
         cursor.execute(query)
         ic("Data from", db_name, ":", data.head())
-		return pd.DataFrame(cursor.fetchall(), columns=['timestamp', 'download_mbps', 'upload_mbps'])
+        return pd.DataFrame(cursor.fetchall(), columns=['timestamp', 'download_mbps', 'upload_mbps'])
     except Exception as e:
         print(f"Error fetching data from database {db_name}: {e}")
         return pd.DataFrame()
@@ -42,7 +42,7 @@ def fetch_data(cursor, db_name):
 def plot_data(data, db_name):
     try:
         ic("Plotting data for", db_name)
-		sns.set(style="whitegrid")
+        sns.set(style="whitegrid")
         plt.figure(figsize=(10, 6))
         plt.plot(data['timestamp'], data['download_mbps'], label='Download Mbps', color='blue')
         plt.plot(data['timestamp'], data['upload_mbps'], label='Upload Mbps', color='red')
@@ -73,7 +73,7 @@ def main():
         dbs = get_databases(cursor)
         ic("Databses Found: ",dbs)
         
-		for db in dbs:
+        for db in dbs:
             # Fetch data from each database
             data = fetch_data(cursor, db)
 
