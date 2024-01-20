@@ -8,6 +8,8 @@ import os
 import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib.dates as mdates
+from datetime import datetime
 from icecream import ic
 
 # Configuration Variables
@@ -44,20 +46,38 @@ def fetch_data(cursor, db_name):
 
 def plot_data(data, db_name):
     try:
-        ic("Plotting data for", db_name)
+        # Convert 'timestamp' column to datetime objects
+        data['timestamp'] = pd.to_datetime(data['timestamp'])
+        
         sns.set(style="whitegrid")
         plt.figure(figsize=(10, 6))
         plt.plot(data['timestamp'], data['download_mbps'], label='Download Mbps', color='blue')
         plt.plot(data['timestamp'], data['upload_mbps'], label='Upload Mbps', color='red')
+        
+        # Improve the readability of the x-axis.
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d %H:%M'))
+        plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=1))
+        plt.gcf().autofmt_xdate()  # Rotation
+
+        # Adding a second y-axis for upload speeds if necessary
+        if data['upload_mbps'].max() < data['download_mbps'].max() / 10:
+            ax2 = plt.gca().twinx()
+            ax2.plot(data['timestamp'], data['upload_mbps'], label='Upload Mbps (right axis)', color='red')
+            ax2.set_ylabel('Upload Speed (Mbps)')
+            ax2.legend(loc='upper right')
+        else:
+            plt.ylabel('Speed (Mbps)')
+        
         plt.xlabel('Timestamp')
-        plt.ylabel('Speed (Mbps)')
         plt.title(f'Speedtest Results for {db_name}')
         plt.legend()
-        # Filename for the output PNG
-        filename = f'{db_name}_speedtest_results.png'
+
+        # Generate the filename with the current date and time
+        current_time = datetime.now().strftime('%Y%m%d%H%M%S')
+        filename = f"{db_name}-{current_time}.png"
         ic(f"Creating plot for {db_name}, saving as {filename}")
 
-        # Saving the plot as a PNG file
+        # Save the plot as a PNG file
         plt.savefig(filename)
         ic(f"Plot saved as {filename}")
 
