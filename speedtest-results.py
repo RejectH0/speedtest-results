@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Created by RejectH0 - 19 JAN 2024 - 1924 MST
+# Created by RejectH0 - 19 JAN 2024 - 1945 MST
 #
 import configparser
 import pymysql
@@ -22,7 +22,7 @@ def get_databases(cursor):
     try:
         cursor.execute("SHOW DATABASES;")
         all_dbs = cursor.fetchall()
-        speedtest_dbs = [db[0] for db in all_dbs if db[0].endswith('-speedtest')]
+        speedtest_dbs = [db[0] for db in all_dbs if db[0].endswith('_speedtest')]
         ic("Databases found:", speedtest_dbs)  # Debugging line
         return speedtest_dbs
     except Exception as e:
